@@ -7,28 +7,11 @@
   height: 80px;
 } */
 
-.App-sap-logo {
-  height: 2rem !important; 
-  width: 4rem !important; 
-  margin-top: -0.23rem !important;
-}
-
 .App-header {
   background-color: #343a40;
   height: 50px  !important;
   padding: 10px 10px !important; 
     
-}
-
-.App-white {  
-  color: white;
-  display: inline;   
-  padding-left: 7px;
-  }
-
-.App-yellow {
-  color: orange;
-  display: inline;
 }
 
 .App-intro {

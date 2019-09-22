@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
-//import logo from './logo.svg';
+import logo from './logo.svg';
 import './App.css';
-import { Container, Header, Card, Icon, Grid, GridColumn, Input, Divider, Segment} from 'semantic-ui-react';
+import { Container, Header, Card, Icon, Grid, GridColumn, Input, Divider, Segment, Menu, Button} from 'semantic-ui-react';
+import { BrowserRouter as Router, NavLink} from 'react-router-dom';
+import Route from 'react-router-dom/Route';
+import DetailComponent from './components/DetailComponent'
+
 class App extends Component{
   constructor(props){
     super(props)
@@ -10,6 +14,9 @@ class App extends Component{
       filteredFunds: []
     }
     this.handleSearch = this.handleSearch.bind(this);
+    this.sortBycategory = this.sortBycategory.bind(this);
+    this.sortBy3y = this.sortBy3y.bind(this);
+    this.sortByPlan = this.sortByPlan.bind(this);
   }
  
   handleSearch = event => {
@@ -29,6 +36,37 @@ class App extends Component{
     }); 
   };
 
+  sortBycategory = (e) => {
+ 
+      e.preventDefault()
+      const myData = [].concat(this.state.funds)
+      .sort((a, b) => a.category.localeCompare(b.category));
+      this.setState({
+        filteredFunds: myData
+      });
+    }
+
+    sortBy3y = (e) => {
+ 
+      e.preventDefault()
+      const myData = [].concat(this.state.funds)
+      .sort((a, b) => a.returns.year_3 - b.returns.year_3);
+      this.setState({
+        filteredFunds: myData
+      });
+    }
+
+    sortByPlan = (e) => {
+ 
+      e.preventDefault()
+      const myData = [].concat(this.state.funds)
+      .sort((a, b) => a.plan.localeCompare(b.plan));
+      this.setState({
+        filteredFunds: myData
+      });
+    }
+  
+
     componentDidMount(){
     const reducedData = [];
           fetch(`https://api.kuvera.in/api/v3/funds.json`)
@@ -47,13 +85,20 @@ class App extends Component{
       }
 
     _displayFundsView = () => {
+      
        return this.state.filteredFunds.map(
         fundsData => (<Card centered color='green'>
            <Card.Content>
-             <Card.Header>{
-               <a>
-                 {fundsData.name}
-               </a>}</Card.Header>
+                <Card.Header>{
+                  <NavLink to={{
+                    pathname: "/detail/",
+                    state: {
+                      code : {fundsData}
+                    }
+                  }} exact activeStyle={{color: 'green'}}>
+                  {fundsData.name}
+                  </NavLink>
+                  }</Card.Header>
              <Card.Content extra>
                 {
                 <section className="container">
@@ -84,36 +129,98 @@ class App extends Component{
          </Card>)
       );        
     }
-
+    handleItemClick = (e, { name }) => this.setState({ activeItem: name })
   render() {
    
     return (
-      <div >
-      <Header  className='App-header' >
-         <h3 className="App-white">KUVERA</h3>
-      </Header>
-        <div className="">
-          <Container>
-            <Header>
-            <Grid>
-            <GridColumn>
-            <Input
-            icon='usd'
-            iconPosition='left'
-            label={{ tag: true, content: 'Mutual Funds' }}
-            labelPosition='right'
-            placeholder='Narrow Your Search'
-            onChange={this.handleSearch}
-              />
-            </GridColumn>
-          </Grid>
-            </Header>
-          <Card.Group>
-    {this._displayFundsView()}
-      </Card.Group>
-          </Container>
-        </div>
+      
+      <Router>
+        <div >
+     <Route path="/" exact strict render={
+       () => {
+         return (
+          <div>
+    <Menu stackable>
+        <Menu.Item>
+          <img alt="" size="large" src={logo} />
+        </Menu.Item>
+        <Menu.Item
+          name='Explore'
+          active={this.state.activeItem === 'Explore'}
+          onClick={this.handleItemClick}
+        >
+          Explore
+        </Menu.Item>
+
+        <Menu.Item
+          name=' SetGoal'
+          onClick={this.handleItemClick}
+        >
+          Set Goal
+        </Menu.Item>
+
+        <Menu.Item
+          name='Features'
+          onClick={this.handleItemClick}
+        >
+          Features
+        </Menu.Item>
+      </Menu>
+         <div className="">
+           <Container>
+             <Header>
+             <Grid columns='equal'>
+             <Grid.Row>
+      <Grid.Column>
+        <Segment>
+        <Input
+             size="small"
+             icon='usd'
+             iconPosition='left'
+             label={{ tag: true, content: 'Mutual Funds' }}
+             labelPosition='right'
+             placeholder='Narrow Your Search'
+             onChange={this.handleSearch}
+               />
+        </Segment>
+      </Grid.Column>
+      <Grid.Column>
+      <Grid.Row>
+        <Segment clearing>
+        SORT BY 
+        <Button.Group floated='right'>
+    <Button  basic color='green'  onClick={this.sortBycategory}>
+      Category
+    </Button>
+    <Button basic color='green' onClick={this.sortBy3y}>
+      3Y Returns
+    </Button>
+    <Button basic color='green' onClick={this.sortByPlan}>
+      Plan
+    </Button>
+  </Button.Group>
+        </Segment>
+        </Grid.Row>
+      </Grid.Column>
+    </Grid.Row>
+           </Grid>
+             </Header>
+           <Card.Group>
+     {this._displayFundsView()}
+       </Card.Group>
+           </Container>
+         </div>
+          </div>
+         )
+       }
+     }>
+
+     </Route>
+     <Route path="/detail/" exact strict component={DetailComponent}>
+
+     </Route>
       </div>
+      </Router>
     );
   }
 }
