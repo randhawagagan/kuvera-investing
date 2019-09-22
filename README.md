@@ -1,6 +1,9 @@
 # kuvera-investing
 Explore mutual funds 
 
+##Prerequisites
+You should have node installed
+
 ##`npm install`
 Download this project or clone and install all dependencies 
 
